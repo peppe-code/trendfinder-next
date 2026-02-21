@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { TrendItem } from '@/lib/types';
 import { createClient } from '@supabase/supabase-js';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import ChatPanel from '@/components/ChatPanel';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -117,7 +118,7 @@ export default function TrendFinderApp() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-6 lg:grid-rows-[auto_1fr]">
           <div className="lg:col-span-3 order-2 lg:order-1 border rounded p-4 bg-white">
             <div className="flex items-center gap-2 mb-4">
               <h2 className="text-lg font-semibold">Prodotti suggeriti ({filtered.length})</h2>
@@ -156,23 +157,28 @@ export default function TrendFinderApp() {
             </div>
           </div>
 
-          <div className="lg:col-span-2 order-1 lg:order-2 border rounded p-4 bg-white">
-            <h2 className="text-lg font-semibold mb-4">Crescita ricerche (proxy)</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={growthData}>
-                  <XAxis dataKey="name" interval={0} tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={60} />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="growth" />
-                </BarChart>
-              </ResponsiveContainer>
+          <div className="lg:col-span-2 order-1 lg:order-2 flex flex-col gap-4">
+            <div className="border rounded p-4 bg-white">
+              <h2 className="text-lg font-semibold mb-4">Crescita ricerche (proxy)</h2>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={growthData}>
+                    <XAxis dataKey="name" interval={0} tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={60} />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="growth" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <button onClick={exportCSV} className="w-full border rounded p-2">Export CSV</button>
+                <button onClick={copyJSON} className="w-full border rounded p-2">Copia JSON</button>
+              </div>
+              <p className="text-xs text-slate-500 mt-3">Se non imposti le chiavi, le API usano mock di fallback.</p>
             </div>
-            <div className="mt-6 flex gap-2">
-              <button onClick={exportCSV} className="w-full border rounded p-2">Export CSV</button>
-              <button onClick={copyJSON} className="w-full border rounded p-2">Copia JSON</button>
+            <div className="flex-1" style={{ minHeight: '380px' }}>
+              <ChatPanel results={filtered} />
             </div>
-            <p className="text-xs text-slate-500 mt-3">Se non imposti le chiavi, le API usano mock di fallback.</p>
           </div>
         </div>
       </div>
