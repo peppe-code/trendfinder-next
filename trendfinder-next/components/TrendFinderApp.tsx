@@ -11,6 +11,8 @@ const supabase = (supabaseUrl && supabaseAnon) ? createClient(supabaseUrl, supab
 
 const formatEUR = (n: number) => new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n);
 const compClass = (c: TrendItem['competition']) => ({ low:'bg-green-100 text-green-700', medium:'bg-amber-100 text-amber-700', high:'bg-red-100 text-red-700' }[c]);
+const sourceLabel = (s: string) => ({ google_trends:'Google Trends', amazon_bs:'Amazon', facebook_ads:'Facebook Ads', tiktok_hashtags:'TikTok', etsy_trends:'Etsy', aliexpress:'AliExpress' }[s] ?? s);
+const sourceBadgeClass = (s: string) => ({ google_trends:'bg-blue-100 text-blue-700', amazon_bs:'bg-orange-100 text-orange-700', facebook_ads:'bg-indigo-100 text-indigo-700' }[s] ?? 'bg-slate-100 text-slate-600');
 
 export default function TrendFinderApp() {
   const [query, setQuery] = useState('pet fountain');
@@ -35,11 +37,12 @@ export default function TrendFinderApp() {
   async function runScan() {
     setLoading(true);
     try {
-      const [gt, am] = await Promise.all([
+      const [gt, am, fb] = await Promise.all([
         fetch(`/api/google-trends?q=${encodeURIComponent(query)}&geo=${geo}`).then(r=>r.json()),
         fetch(`/api/amazon-best?category=${encodeURIComponent(category)}&country=${geo.toLowerCase()}`).then(r=>r.json()),
+        fetch(`/api/facebook-ads?q=${encodeURIComponent(query)}&geo=${geo}`).then(r=>r.json()),
       ]);
-      const merged: TrendItem[] = [...(gt?.items||[]), ...(am?.items||[])];
+      const merged: TrendItem[] = [...(gt?.items||[]), ...(am?.items||[]), ...(fb?.items||[])];
       setResults(merged);
 
       if (supabase) {
@@ -77,7 +80,7 @@ export default function TrendFinderApp() {
           TrendFinder <span className="text-slate-400">— Ricerca prodotti in trend</span>
         </motion.h1>
 
-        <p className="text-slate-500 mt-2">Google Trends + Amazon Best Sellers. Export CSV. (Supabase opzionale)</p>
+        <p className="text-slate-500 mt-2">Google Trends + Amazon Best Sellers + Facebook Ad Library. Export CSV. (Supabase opzionale)</p>
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
           <div className="md:col-span-2">
@@ -127,6 +130,7 @@ export default function TrendFinderApp() {
                 <thead>
                   <tr className="text-left text-slate-500 border-b">
                     <th className="py-2 pr-3">Prodotto</th>
+                    <th className="py-2 pr-3">Fonte</th>
                     <th className="py-2 pr-3">Niche</th>
                     <th className="py-2 pr-3">Score</th>
                     <th className="py-2 pr-3">Crescita 90g</th>
@@ -139,6 +143,7 @@ export default function TrendFinderApp() {
                   {filtered.map(item => (
                     <tr key={item.id} className="border-b last:border-b-0">
                       <td className="py-2 pr-3 font-medium">{item.title}</td>
+                      <td className="py-2 pr-3"><span className={`px-2 py-1 rounded text-xs ${sourceBadgeClass(item.source)}`}>{sourceLabel(item.source)}</span></td>
                       <td className="py-2 pr-3">{item.niche}</td>
                       <td className="py-2 pr-3">{item.score}</td>
                       <td className="py-2 pr-3">+{item.searchGrowth90d}%</td>
@@ -172,7 +177,7 @@ export default function TrendFinderApp() {
               <button onClick={exportCSV} className="w-full border rounded p-2">Export CSV</button>
               <button onClick={copyJSON} className="w-full border rounded p-2">Copia JSON</button>
             </div>
-            <p className="text-xs text-slate-500 mt-3">Se non imposti le chiavi, le API usano mock di fallback.</p>
+            <p className="text-xs text-slate-500 mt-3">Sorgenti: Google Trends, Amazon (SerpAPI), Facebook Ad Library. Senza chiavi API si usa il mock di fallback.</p>
           </div>
         </div>
       </div>

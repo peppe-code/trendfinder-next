@@ -61,4 +61,41 @@ export const MOCK_DATA: TrendItem[] = [
     wowClicks: 7,
     tags: ['pulizia','portatile','usb-c']
   },
+  // ── Facebook Ads mock ──────────────────────────────────────────────────────
+  {
+    id: 'fb-001',
+    title: 'Cuscino lombare ergonomico con massaggio (USB)',
+    niche: 'Health & Wellness',
+    source: 'facebook_ads',
+    score: 85,
+    searchGrowth90d: 112,
+    competition: 'medium',
+    avgPrice: 45.0,
+    wowClicks: 28,
+    tags: ['facebook-ad','paid-traffic','risolve un problema','postura','ufficio']
+  },
+  {
+    id: 'fb-002',
+    title: 'Depilatore luce pulsata (IPL) uso domestico',
+    niche: 'Beauty',
+    source: 'facebook_ads',
+    score: 81,
+    searchGrowth90d: 98,
+    competition: 'high',
+    avgPrice: 79.0,
+    wowClicks: 19,
+    tags: ['facebook-ad','paid-traffic','beauty','risolve un problema']
+  },
+  {
+    id: 'fb-003',
+    title: 'Tappetino agopressione schiena + cuscino kit',
+    niche: 'Health & Wellness',
+    source: 'facebook_ads',
+    score: 77,
+    searchGrowth90d: 74,
+    competition: 'low',
+    avgPrice: 32.0,
+    wowClicks: 14,
+    tags: ['facebook-ad','paid-traffic','risolve un problema','relax']
+  },
 ];
